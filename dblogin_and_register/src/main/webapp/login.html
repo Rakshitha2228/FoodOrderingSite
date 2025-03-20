@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Login and Register Page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f8f8f8;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 400px;
+        }
+        .container h2 {
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .container p {
+            margin-bottom: 20px;
+            color: #777;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .btn {
+            background: #e91e63;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background: #d81b60;
+        }
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: #e91e63;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .toggle-btn:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div id="login-form">
+            <h2>Login</h2>
+            <p>More than <strong>15,000 recipes</strong> from around the world!</p>
+            <input type="email" id="login-username" placeholder="Enter Email Address">
+            <input type="password" id="login-password" placeholder="Password">
+            <button class="btn" onclick="sendRequest('login')">LOGIN</button>
+            <button class="toggle-btn" onclick="toggleForm()">Don't have an account? Register</button>
+        </div>
+
+        <!-- Register Form -->
+        <div id="register-form" style="display: none;">
+            <h2>Register</h2>
+            <p>Create a new account</p>
+            <input type="text" id="register-name" placeholder="Full Name">
+            <input type="email" id="register-username" placeholder="Enter Email Address">
+            <input type="password" id="register-password" placeholder="Password">
+            <button class="btn" onclick="sendRequest('register')">REGISTER</button>
+            <button class="toggle-btn" onclick="toggleForm()">Already have an account? Login</button>
+        </div>
+    </div>
+
+    <script>
+        // Toggle between login and register forms
+        function toggleForm() {
+            let loginForm = document.getElementById('login-form');
+            let registerForm = document.getElementById('register-form');
+            if (loginForm.style.display === 'none') {
+                loginForm.style.display = 'block';
+                registerForm.style.display = 'none';
+            } else {
+                loginForm.style.display = 'none';
+                registerForm.style.display = 'block';
+            }
+        }
+
+        // Send login/register request to the server
+        function sendRequest(type) {
+            let formData = new URLSearchParams();
+            let url = "";
+
+            if (type === "register") {
+                let fullname = document.getElementById("register-name").value.trim();
+                let username = document.getElementById("register-username").value.trim();
+                let password = document.getElementById("register-password").value.trim();
+
+                if (!fullname || !username || !password) {
+                    alert("Please fill in all fields!");
+                    return;
+                }
+
+                formData.append("fullname", fullname);
+                formData.append("username", username);
+                formData.append("password", password);
+                url = "http://localhost:8080/login_and_register/RegisterServlet";
+            } 
+            else if (type === "login") {
+                let username = document.getElementById("login-username").value.trim();
+                let password = document.getElementById("login-password").value.trim();
+
+                if (!username || !password) {
+                    alert("Please enter both email and password!");
+                    return;
+                }
+
+                formData.append("username", username);
+                formData.append("password", password);
+                url = "http://localhost:8080/login_and_register/LoginServlet";
+            }
+
+            console.log("Sending Data:", formData.toString()); // Debugging output
+
+            fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: formData.toString()
+            })
+            .then(response => response.text()) // Expecting a plain text response
+            .then(data => {
+                console.log("Response Received:", data); // Debugging output
+                alert(data); // Display server response message
+            })
+            .catch(error => {
+                console.error("Fetch Error:", error);
+                alert("Error connecting to the server. Please try again.");
+            });
+        }
+    </script>
+</body>
+</html>
